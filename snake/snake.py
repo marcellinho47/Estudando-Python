@@ -1,5 +1,4 @@
 import curses
-import time
 
 
 def game_loop(window):
