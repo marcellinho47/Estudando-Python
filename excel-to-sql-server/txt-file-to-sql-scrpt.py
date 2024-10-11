@@ -2,19 +2,19 @@ import os
 import pandas as pd
 
 
-def get_csv_files(directory):
-    return [f for f in os.listdir(directory) if f.endswith('.txt')]
+def get_csv_files(from_directory):
+    return [f for f in os.listdir(from_directory) if f.endswith('.txt')]
 
 
-def analyze_csv_files(directory):
-    csv_files = get_csv_files(directory)
+def analyze_csv_files(from_directory, to_directory):
+    csv_files = get_csv_files(from_directory)
 
     create_tables = ''
     bulkinsert = ''
 
     for file in csv_files:
-        file_path = os.path.join(directory, file)
-        df = pd.read_csv(file_path, sep='\t')
+        file_path = os.path.join(from_directory, file)
+        df = pd.read_csv(file_path, sep='\t', dtype=str, encoding='ansi')
         max_lengths = df.astype(str).map(len).max()
 
         table_name = file.replace(".txt", "")
@@ -24,7 +24,7 @@ def analyze_csv_files(directory):
 
         create_tables = create_tables[:-2] + '\n)\n\n\n\n'
 
-        with open(os.path.join(directory, 'create-table.txt'), 'w') as f:
+        with open(os.path.join(to_directory, 'create-table.txt'), 'w') as f:
             f.write(create_tables)
 
         bulkinsert += f'BULK INSERT {table_name}\n'
@@ -33,13 +33,14 @@ def analyze_csv_files(directory):
         bulkinsert += 'FIELDTERMINATOR = \'\\t\',\n'
         bulkinsert += 'ROWTERMINATOR = \'\\n\',\n'
         bulkinsert += 'FIRSTROW = 2,\n'
-        bulkinsert += 'CODEPAGE = \'65001\'\n'
+        bulkinsert += 'CODEPAGE = \'ACP\'\n'
         bulkinsert += ')\n\n\n\n'
 
-        with open(os.path.join(directory, 'bulk-insert.txt'), 'w') as f:
+        with open(os.path.join(to_directory, 'bulk-insert.txt'), 'w') as f:
             f.write(bulkinsert)
 
 
 # Example usage
-directory = 'C:\\Users\\marcello.alves\\Downloads\\Sinqia\\tabelas\\'
-analyze_csv_files(directory)
+from_directory = 'C:\\Users\\marcello.alves\\Downloads\\Anton Paar TXT\\'
+to_directory = 'C:\\Users\\marcello.alves\\Downloads\\Anton Paar SCRIPTS\\'
+analyze_csv_files(from_directory, to_directory)

@@ -1,27 +1,49 @@
+import os
 import pandas as pd
 
 
-def import_excel_to_sql_server(excel_path):
-    # Read the Excel file
-    xls = pd.ExcelFile(excel_path)
+def import_excel_to_txt(from_directory, to_directory):
+    # Iterate over each Excel file in the directory
+    for filename in os.listdir(from_directory):
+        if filename.endswith('.xlsx') or filename.endswith('.xls') or filename.endswith('.csv'):
+            excel_path = os.path.join(from_directory, filename)
 
-    # Iterate over each sheet
-    for sheet_name in xls.sheet_names:
-        # Read the sheet into a DataFrame
-        df = pd.read_excel(xls, sheet_name=sheet_name)
-        sheet_name = sheet_name.replace('PREVIMINAS_001.', '')
+            clean_filename = os.path.splitext(filename)[0]
 
-        if df.empty:
-            print(f'Ignored {sheet_name}.txt')
-            continue
-        else:
-            # Export the DataFrame to a delimited txt file
-            df.to_csv(f'C:\\Users\\marcello.alves\\Downloads\\Sinqia\\tabelas\\{sheet_name}.txt', sep='\t',
-                      index=False)
-            print(f'Exported {sheet_name}.txt')
+            if filename.endswith('.csv'):
+                xls = pd.read_csv(excel_path, dtype=str)
+                sheet_names = [os.path.splitext(filename)[0]]
+                df = xls.map(lambda x: x.replace('\t', '') if isinstance(x, str) else x)
+
+                if df.empty:
+                    print(f'Ignored {clean_filename}.txt from {filename}')
+                    continue
+                else:
+                    # Export the DataFrame to a delimited txt file
+                    txt_file_path = os.path.join(to_directory, f'{clean_filename}.txt')
+                    df.to_csv(txt_file_path, sep='\t', index=False, encoding='ansi')
+                    print(f'Exported {clean_filename}.txt from {filename}')
+
+            else:
+                xls = pd.ExcelFile(excel_path)
+                sheet_names = xls.sheet_names
+
+                # Iterate over each sheet
+                for sheet_name in sheet_names:
+                    df = pd.read_excel(xls, sheet_name=sheet_name).map(
+                        lambda x: x.replace('\t', '') if isinstance(x, str) else x)
+
+                    if df.empty:
+                        print(f'Ignored {clean_filename}.txt from {filename}')
+                        continue
+                    else:
+                        # Export the DataFrame to a delimited txt file
+                        txt_file_path = os.path.join(to_directory, f'{clean_filename}.txt')
+                        df.to_csv(txt_file_path, sep='\t', index=False, encoding='ansi')
+                        print(f'Exported {clean_filename}.txt from {filename}')
 
 
-# Path to the Excel file
-excel_path = 'C:\\Users\\marcello.alves\\Downloads\\Sinqia\\excel\\exportar2.xlsx'
-
-import_excel_to_sql_server(excel_path)
+# Usage
+from_directory = 'C:\\Users\\marcello.alves\\Downloads\\Anton Paar'
+to_directory = 'C:\\Users\\marcello.alves\\Downloads\\Anton Paar TXT'
+import_excel_to_txt(from_directory, to_directory)
