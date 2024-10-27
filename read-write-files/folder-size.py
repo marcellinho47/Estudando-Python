@@ -8,9 +8,11 @@ def calculate_folder_size(folder):
 
     for path in folder.rglob('*'):
         if path.is_file():
-            total_size += os.get_terminal_size()
+            total_size += os.path.getsize(path)
 
-    return total_size
+    return total_size / 1024 / 1024
 
 
-print(calculate_folder_size('/Users/marcello/Dev'))
+total_size = calculate_folder_size('C:\\Dev')
+print(f'{total_size} MB')
+
