@@ -21,7 +21,13 @@ def get_last_pdf_uploaded_seq():
         return 0
 
 
+def create_folder():
+    if not PDFS_UPLOADS.exists():
+        PDFS_UPLOADS.mkdir()
+
+
 def save_uploaded_file(uploaded_file):
+    create_folder()
     last_pdf_uploaded_seq = get_last_pdf_uploaded_seq()
     last_pdf_uploaded_seq += 1
     open(PDFS_UPLOADS / f'{last_pdf_uploaded_seq}.pdf', 'wb').write(uploaded_file.getbuffer())
