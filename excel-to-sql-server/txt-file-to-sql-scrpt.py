@@ -3,7 +3,7 @@ import pandas as pd
 
 
 def get_csv_files(from_directory):
-    return [f for f in os.listdir(from_directory) if f.endswith('.txt')]
+    return [f for f in os.listdir(from_directory) if f.endswith('.txt') or f.endswith('.csv')]
 
 
 def analyze_csv_files(from_directory, to_directory):
@@ -14,10 +14,10 @@ def analyze_csv_files(from_directory, to_directory):
 
     for file in csv_files:
         file_path = os.path.join(from_directory, file)
-        df = pd.read_csv(file_path, sep='\t', dtype=str, encoding='ansi')
+        df = pd.read_csv(file_path, sep=';', dtype=str, encoding='ansi')
         max_lengths = df.astype(str).map(len).max()
 
-        table_name = file.replace(".txt", "")
+        table_name = file.replace(".txt", "").replace(".csv", "")
         create_tables += f'CREATE TABLE {table_name} (\n'
         for column, length in max_lengths.items():
             create_tables += f'[{column}] VARCHAR({length}),\n'
@@ -30,10 +30,11 @@ def analyze_csv_files(from_directory, to_directory):
         bulkinsert += f'BULK INSERT {table_name}\n'
         bulkinsert += f'FROM \'{file_path}\'\n'
         bulkinsert += 'WITH (\n'
-        bulkinsert += 'FIELDTERMINATOR = \'\\t\',\n'
         bulkinsert += 'ROWTERMINATOR = \'\\n\',\n'
+        bulkinsert += 'FIELDTERMINATOR = \'\\t\',\n'
         bulkinsert += 'FIRSTROW = 2,\n'
-        bulkinsert += 'CODEPAGE = \'ACP\'\n'
+#       bulkinsert += 'CODEPAGE = \'ACP\'\n'    # ANSI
+        bulkinsert += 'CODEPAGE = \'65001\'\n'  # UTF-8
         bulkinsert += ')\n\n\n\n'
 
         with open(os.path.join(to_directory, 'bulk-insert.txt'), 'w') as f:
@@ -41,6 +42,6 @@ def analyze_csv_files(from_directory, to_directory):
 
 
 # Example usage
-from_directory = 'C:\\Users\\marcello.alves\\Downloads\\Anton Paar TXT\\'
-to_directory = 'C:\\Users\\marcello.alves\\Downloads\\Anton Paar SCRIPTS\\'
+from_directory = 'C:\\Sharepoint\\OneDrive\\Downloads\\bluefit'
+to_directory = 'C:\\Sharepoint\\OneDrive\\Downloads\\bluefit scripts\\'
 analyze_csv_files(from_directory, to_directory)
