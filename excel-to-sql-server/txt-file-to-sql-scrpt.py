@@ -6,7 +6,7 @@ def get_csv_files(from_directory):
     return [f for f in os.listdir(from_directory) if f.endswith('.txt')]
 
 
-def analyze_csv_files(from_directory, to_directory):
+def analyze_csv_files(from_directory, to_directory, separator):
     csv_files = get_csv_files(from_directory)
 
     create_tables = ''
@@ -14,7 +14,7 @@ def analyze_csv_files(from_directory, to_directory):
 
     for file in csv_files:
         file_path = os.path.join(from_directory, file)
-        df = pd.read_csv(file_path, sep='\t', dtype=str, encoding='ansi')
+        df = pd.read_csv(file_path, sep=separator, dtype=str, encoding='ansi')
         max_lengths = df.astype(str).map(len).max()
 
         table_name = file.replace(".txt", "")
@@ -27,13 +27,17 @@ def analyze_csv_files(from_directory, to_directory):
         with open(os.path.join(to_directory, 'create-table.txt'), 'w') as f:
             f.write(create_tables)
 
+        if separator.startswith('\\'):
+            separator = '\\' + separator
+
         bulkinsert += f'BULK INSERT {table_name}\n'
         bulkinsert += f'FROM \'{file_path}\'\n'
         bulkinsert += 'WITH (\n'
-        bulkinsert += 'FIELDTERMINATOR = \'\\t\',\n'
+        bulkinsert += 'FIELDTERMINATOR = \'' + separator + '\',\n'
         bulkinsert += 'ROWTERMINATOR = \'\\n\',\n'
         bulkinsert += 'FIRSTROW = 2,\n'
-        bulkinsert += 'CODEPAGE = \'ACP\'\n'
+        bulkinsert += 'CODEPAGE = \'65001\'\n'  # UTF-8
+#        bulkinsert += 'CODEPAGE = \'ACP\'\n'    # ANSI
         bulkinsert += ')\n\n\n\n'
 
         with open(os.path.join(to_directory, 'bulk-insert.txt'), 'w') as f:
@@ -41,6 +45,7 @@ def analyze_csv_files(from_directory, to_directory):
 
 
 # Example usage
-from_directory = 'C:\\Users\\marcello.alves\\Downloads\\Anton Paar TXT\\'
-to_directory = 'C:\\Users\\marcello.alves\\Downloads\\Anton Paar SCRIPTS\\'
-analyze_csv_files(from_directory, to_directory)
+from_directory = 'C:\\Users\\marce\\Downloads\\somerlog\\'
+to_directory = 'C:\\Users\\marce\\Downloads\\somerlog\\'
+separator = ';'
+analyze_csv_files(from_directory, to_directory, separator)
