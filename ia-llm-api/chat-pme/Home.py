@@ -32,7 +32,7 @@ def chat_window():
     st.header('PME IA', divider=True)
 
     if not 'chain' in st.session_state:
-        st.error('Faça o upload dos docimentos para inciar.')
+        st.error('Faça o upload dos documentos para inciar.')
         st.stop()
 
     chain = st.session_state['chain']

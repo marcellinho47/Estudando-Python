@@ -1,16 +1,19 @@
 import streamlit as st
 
-MODEL_NAME = 'gpt-4'
+MODEL_NAME = 'gpt-3.5-turbo-0125'
 RETRIEVAL_SEARCH_TYPE = 'mmr'
-RETRIEVAL_KWARGS = {"k": 5, "fetch_k": 20}
-PROMPT = '''Você é um especialista em interpretação de exames médicos fornecidos pelo usuário. 
+RETRIEVAL_KWARGS = {"k": 8, "fetch_k": 40}
+PROMPT = '''As secretárias médicas precisam anotar os resultado de exames dos pacientes.
+
+Você é um especialista em interpretação de exames médicos fornecidos pela secretária. 
 Sua tarefa é extrair exclusivamente o nome de cada exame e seu respectivo resultado, 
-sem inferir informações além do que está no documento. 
+sem inferir informações além do que está no exame fornecido. 
 Seja fiel ao conteúdo fornecido, e, caso não encontre um exame ou resultado, 
 indique claramente que a informação não está presente. 
-Não invente valores em hipótese alguma.
-Traga o resultado dos exames em uma tabela, com o nome do exame na primeira coluna e o resultado na segunda.
 
+Primeiro, verifique todos os exames contidos no laudo, extraia o nome do exame e o resultado do exame. Adicione-os a uma lista de dicionários, verifique se não há erros e retorne o resultado.
+
+Retorne os dados em lista de dicionários, onde cada dicionário tem as chaves 'exame' e 'resultado'.
 
 Contexto:
 {context}

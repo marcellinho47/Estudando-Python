@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import pandas as pd
 from dotenv import load_dotenv, find_dotenv
 from langchain.chains.conversational_retrieval.base import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
@@ -20,20 +19,10 @@ PASTA_ARQUIVOS = Path(__file__).parent / 'arquivos'
 
 def importacao_documentos():
     documentos = []
-    for arquivo in PASTA_ARQUIVOS.glob('*.*'):
-        if arquivo.suffix == '.pdf':  # Carregar PDFs
-            loader = PyPDFLoader(str(arquivo))
-            documentos_arquivo = loader.load()
-            documentos.extend(documentos_arquivo)
-        elif arquivo.suffix in ['.xlsx', '.xls']:  # Carregar Excel
-            # Carregar o conteúdo de cada planilha em um DataFrame
-            xlsx_data = pd.ExcelFile(arquivo)
-            for sheet_name in xlsx_data.sheet_names:  # Iterar pelas abas
-                df = xlsx_data.parse(sheet_name)
-                # Transformar cada linha em um "documento"
-                for index, row in df.iterrows():
-                    conteudo = " ".join([f"{col}: {val}" for col, val in row.items()])
-                    documentos.append({"page_content": conteudo, "source": str(arquivo), "sheet": sheet_name})
+    for arquivo in PASTA_ARQUIVOS.glob('*.pdf'):
+        loader = PyPDFLoader(str(arquivo))
+        documentos_arquivo = loader.load()
+        documentos.extend(documentos_arquivo)
     return documentos
 
 
