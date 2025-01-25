@@ -13,5 +13,5 @@ def unify_files(directory, output_file):
 
 
 # Example usage
-unify_files('C:\\Users\\marcello.alves\\Downloads\\2427014074_folha',
-            'C:\\Users\\marcello.alves\\Downloads\\2427014074_folha\\ORIGEM_FOLHA.txt')
+unify_files('C:\\Users\\marce\\Downloads\\T&F - Folha',
+            'C:\\Users\\marce\\Downloads\\T&F - Folha\\ORIGEM_FOLHA.txt')
