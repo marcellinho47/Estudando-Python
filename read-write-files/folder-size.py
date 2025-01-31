@@ -15,4 +15,3 @@ def calculate_folder_size(folder):
 
 total_size = calculate_folder_size('C:\\Dev')
 print(f'{total_size} MB')
-

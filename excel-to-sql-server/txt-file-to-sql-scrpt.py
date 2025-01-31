@@ -36,8 +36,8 @@ def analyze_csv_files(from_directory, to_directory, separator):
         bulkinsert += 'FIELDTERMINATOR = \'' + separator + '\',\n'
         bulkinsert += 'ROWTERMINATOR = \'\\n\',\n'
         bulkinsert += 'FIRSTROW = 2,\n'
-#        bulkinsert += 'CODEPAGE = \'65001\'\n'  # UTF-8
-        bulkinsert += 'CODEPAGE = \'ACP\'\n'    # ANSI
+        #        bulkinsert += 'CODEPAGE = \'65001\'\n'  # UTF-8
+        bulkinsert += 'CODEPAGE = \'ACP\'\n'  # ANSI
         bulkinsert += ')\n\n\n\n'
 
         with open(os.path.join(to_directory, 'bulk-insert.txt'), 'w') as f:
