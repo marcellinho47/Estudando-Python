@@ -3,6 +3,10 @@ import pandas as pd
 
 
 def import_excel_to_txt(from_directory, to_directory):
+    # Create the directory if it doesn't exist
+    if not os.path.exists(to_directory):
+        os.makedirs(to_directory)
+
     # Iterate over each Excel file in the directory
     for filename in os.listdir(from_directory):
         if filename.endswith('.xlsx') or filename.endswith('.xls') or filename.endswith('.csv'):
@@ -48,6 +52,6 @@ def import_excel_to_txt(from_directory, to_directory):
 
 
 # Usage
-from_directory = 'C:\\Users\\marce\\Downloads'
-to_directory = 'C:\\Users\\marce\\Downloads'
+from_directory = 'C:\\Users\\marce\\Desktop'
+to_directory = 'C:\\Users\\marce\\Desktop\\txt_files'
 import_excel_to_txt(from_directory, to_directory)

@@ -20,7 +20,7 @@ def analyze_csv_files(from_directory, to_directory, separator):
         table_name = file.replace(".txt", "")
         create_tables += f'CREATE TABLE {table_name} (\n'
         for column, length in max_lengths.items():
-            create_tables += f'[{column}] VARCHAR({length}),\n'
+            create_tables += f'[{column}] VARCHAR({length + 20}),\n'
 
         create_tables = create_tables[:-2] + '\n)\n\n\n\n'
 
@@ -45,7 +45,7 @@ def analyze_csv_files(from_directory, to_directory, separator):
 
 
 # Example usage
-from_directory = 'C:\\Users\\marce\\Downloads\\Daniele Banco\\'
-to_directory = 'C:\\Users\\marce\\Downloads\\Daniele Banco\\'
+from_directory = 'C:\\Users\\marce\\Desktop\\txt_files\\'
+to_directory = 'C:\\Users\\marce\\Desktop\\'
 separator = '\t'
 analyze_csv_files(from_directory, to_directory, separator)
