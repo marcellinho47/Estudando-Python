@@ -16,42 +16,51 @@ def import_excel_to_txt(from_directory, to_directory):
 
             # CSV Files
             if filename.endswith('.csv'):
-                xls = pd.read_csv(excel_path, dtype=str)
-                sheet_names = [os.path.splitext(filename)[0]]
-                df = xls.map(lambda x: x.replace('\t', '') if isinstance(x, str) else x)
-
-                if df.empty:
-                    print(f'Ignored {clean_filename}.txt from {filename}')
-                    continue
-                else:
-                    # Export the DataFrame to a delimited txt file
-                    txt_file_path = os.path.join(to_directory, f'{clean_filename}.txt')
-                    df.to_csv(txt_file_path, sep='\t', index=False, encoding='ansi')
-                    print(f'Exported {clean_filename}.txt from {filename}')
-
-            # Excel Files
-            else:
-                xls = pd.ExcelFile(excel_path)
-                sheet_names = xls.sheet_names
-
-                # Iterate over each sheet
-                for sheet_name in sheet_names:
-                    df = pd.read_excel(xls, sheet_name=sheet_name).map(
-                        lambda x: x.replace('\t', '') if isinstance(x, str) else x).map(
-                        lambda x: x.replace('\n', '') if isinstance(x, str) else x).map(
-                        lambda x: x.replace('\r\n', '') if isinstance(x, str) else x)
+                try:
+                    xls = pd.read_csv(excel_path, dtype=str)
+                    sheet_names = [os.path.splitext(filename)[0]]
+                    df = xls.map(lambda x: x.replace('\t', '') if isinstance(x, str) else x)
 
                     if df.empty:
-                        print(f'Ignored {sheet_name}.txt from {sheet_name}')
+                        print(f'Ignored {clean_filename}.txt from {filename}')
                         continue
                     else:
                         # Export the DataFrame to a delimited txt file
-                        txt_file_path = os.path.join(to_directory, f'{sheet_name}.txt')
-                        df.to_csv(txt_file_path, sep='\t', index=False, encoding='ansi')
-                        print(f'Exported {sheet_name}.txt from {sheet_name}')
+                        txt_file_path = os.path.join(to_directory, f'{clean_filename}.txt')
+                        df.to_csv(txt_file_path, sep='\t', index=False, encoding='utf-8', errors='replace')
+                        print(f'Exported {clean_filename}.txt from {filename}')
+                except Exception as e:
+                    print(f'Error processing {filename}: {str(e)}')
+
+            # Excel Files
+            else:
+                try:
+                    xls = pd.ExcelFile(excel_path)
+                    sheet_names = xls.sheet_names
+
+                    # Iterate over each sheet
+                    for sheet_name in sheet_names:
+                        try:
+                            df = pd.read_excel(xls, sheet_name=sheet_name).fillna('').astype(str).map(
+                                lambda x: x.replace('\t', '') if isinstance(x, str) else x).map(
+                                lambda x: x.replace('\n', '') if isinstance(x, str) else x).map(
+                                lambda x: x.replace('\r\n', '') if isinstance(x, str) else x)
+
+                            if df.empty:
+                                print(f'Ignored {sheet_name}.txt from {sheet_name}')
+                                continue
+                            else:
+                                # Export the DataFrame to a delimited txt file
+                                txt_file_path = os.path.join(to_directory, f'{sheet_name}.txt')
+                                df.to_csv(txt_file_path, sep='\t', index=False, encoding='utf-8')
+                                print(f'Exported {sheet_name}.txt from {sheet_name}')
+                        except Exception as e:
+                            print(f'Error processing sheet {sheet_name} in {filename}: {str(e)}')
+                except Exception as e:
+                    print(f'Error opening {filename}: {str(e)}')
 
 
 # Usage
-from_directory = 'C:\\Users\\marce\\Desktop'
-to_directory = 'C:\\Users\\marce\\Desktop\\txt_files'
+from_directory = 'C:\\TEMP G'
+to_directory = 'C:\\TEMP'
 import_excel_to_txt(from_directory, to_directory)
