@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import gc
 
 
 def get_csv_files(from_directory):
@@ -13,9 +14,43 @@ def analyze_csv_files(from_directory, to_directory, separator):
     bulkinsert = ''
 
     for file in csv_files:
+        print(f"Processando arquivo: {file}")
         file_path = os.path.join(from_directory, file)
-        df = pd.read_csv(file_path, sep=separator, dtype=str, encoding='ansi')
-        max_lengths = df.astype(str).map(len).max()
+        
+        # Análise incremental usando chunks
+        max_lengths = {}
+        chunk_size = 50000
+        total_rows = 0
+        
+        try:
+            # Processar arquivo em chunks
+            chunk_reader = pd.read_csv(file_path, sep=separator, dtype=str, 
+                                     encoding='utf-8', chunksize=chunk_size,
+                                     on_bad_lines='skip')
+            
+            for chunk_num, chunk in enumerate(chunk_reader, 1):
+                print(f"  Processando chunk {chunk_num} ({len(chunk)} linhas)")
+                
+                # Calcular comprimentos máximos para este chunk
+                chunk_max_lengths = chunk.astype(str).applymap(len).max()
+                
+                # Atualizar comprimentos máximos globais
+                for column, length in chunk_max_lengths.items():
+                    if pd.isna(length):
+                        length = 0
+                    max_lengths[column] = max(max_lengths.get(column, 0), int(length))
+                
+                total_rows += len(chunk)
+                
+                # Liberar memória
+                del chunk
+                gc.collect()
+            
+            print(f"  Total de linhas processadas: {total_rows}")
+            
+        except Exception as e:
+            print(f"Erro ao processar {file}: {e}")
+            continue
 
         table_name = file.replace(".txt", "")
         create_tables += f'CREATE TABLE {table_name} (\n'
@@ -47,5 +82,5 @@ def analyze_csv_files(from_directory, to_directory, separator):
 # Example usage
 from_directory = 'C:\\TEMP\\'
 to_directory = 'C:\\TEMP G\\'
-separator = '\t'
+separator = ';'
 analyze_csv_files(from_directory, to_directory, separator)
