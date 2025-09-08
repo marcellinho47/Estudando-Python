@@ -53,9 +53,11 @@ def analyze_csv_files(from_directory, to_directory, separator):
             continue
 
         table_name = file.replace(".txt", "")
-        create_tables += f'CREATE TABLE {table_name} (\n'
+        create_tables += f'CREATE TABLE [{table_name}] (\n'
         for column, length in max_lengths.items():
-            create_tables += f'[{column}] VARCHAR({length + 20}),\n'
+
+            temp_column = column.replace('[', '').replace(']', '').replace('(', '').replace(')', '')
+            create_tables += f'[{temp_column}] VARCHAR({length + 20}),\n'
 
         create_tables = create_tables[:-2] + '\n)\n\n\n\n'
 
@@ -65,7 +67,7 @@ def analyze_csv_files(from_directory, to_directory, separator):
         if separator.startswith('\\'):
             separator = '\\' + separator
 
-        bulkinsert += f'BULK INSERT {table_name}\n'
+        bulkinsert += f'BULK INSERT [{table_name}]\n'
         bulkinsert += f'FROM \'{file_path}\'\n'
         bulkinsert += 'WITH (\n'
         bulkinsert += 'FIELDTERMINATOR = \'' + separator + '\',\n'
@@ -82,5 +84,5 @@ def analyze_csv_files(from_directory, to_directory, separator):
 # Example usage
 from_directory = 'C:\\TEMP\\'
 to_directory = 'C:\\TEMP G\\'
-separator = ';'
+separator = '\t'
 analyze_csv_files(from_directory, to_directory, separator)
