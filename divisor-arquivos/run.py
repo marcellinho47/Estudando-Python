@@ -22,9 +22,9 @@ def splice_txt_file_by_size(file, max_size):
 
 
 if __name__ == '__main__':
-    from_directory = 'C:\\Users\\marce\\Desktop'
+    from_directory = 'C:\\Users\\marcello.alves\\Downloads\\'
     txt_files = get_txt_files(from_directory)
-    max_size = 500000
+    max_size = 1000
 
     for file in txt_files:
         file_path = os.path.join(from_directory, file)
