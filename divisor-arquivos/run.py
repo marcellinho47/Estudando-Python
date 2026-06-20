@@ -6,25 +6,26 @@ def get_txt_files(from_directory):
 
 
 def splice_txt_file_by_size(file, max_size):
-    with open(file, 'r') as f:
-        lines = f.readlines()
-        n_lines = len(lines)
-        n_files = n_lines // max_size
-        n_lines_last_file = n_lines % max_size
+    with open(file, 'r', encoding='utf-8', errors='replace') as f:
+        file_count = 0
+        lines = []
+        for line in f:
+            lines.append(line)
+            if len(lines) >= max_size:
+                with open(file.replace('.txt', f'_{file_count}.txt'), 'w', encoding='utf-8') as out_f:
+                    out_f.writelines(lines)
+                file_count += 1
+                lines = []
 
-        for i in range(n_files):
-            with open(file.replace('.txt', f'_{i}.txt'), 'w') as f:
-                f.writelines(lines[i * max_size:(i + 1) * max_size])
-
-        if n_lines_last_file > 0:
-            with open(file.replace('.txt', f'_{n_files}.txt'), 'w') as f:
-                f.writelines(lines[n_files * max_size:])
+        if lines:
+            with open(file.replace('.txt', f'_{file_count}.txt'), 'w', encoding='utf-8') as out_f:
+                out_f.writelines(lines)
 
 
 if __name__ == '__main__':
-    from_directory = 'C:\\Users\\marcello.alves\\Downloads\\'
+    from_directory = 'C:\\TEMP\\'
     txt_files = get_txt_files(from_directory)
-    max_size = 1000
+    max_size = 1000000
 
     for file in txt_files:
         file_path = os.path.join(from_directory, file)
